@@ -1,0 +1,21 @@
+{
+  "name": "hw-liribot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "keys.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "dotenv": "^6.1.0",
+    "http": "0.0.0",
+    "node-spotify-api": "^1.0.7",
+    "request": "^2.88.0",
+    "simple-node-logger": "^0.93.40",
+    "spotify-web-api-node": "^4.0.0",
+    "twitter": "^1.7.1"
+  }
+}
