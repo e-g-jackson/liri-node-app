@@ -5,8 +5,8 @@ var axios = require('axios');
 var SpotifyAPI = require('node-spotify-api');
 var input = process.argv[2];
 var input2 = process.argv[3];
-//verify inputs
-console.log('input = ', input, ' input2 = ', input2);
+
+//Band is in Town function
 var BITFxn = function(){
     var BIT = 'https://rest.bandsintown.com/artists/' + input2 + '/events?app_id=codingbootcamp';
     axios.get(BIT).then(function(response){
@@ -18,10 +18,12 @@ var BITFxn = function(){
             var country = rsp[i].venue.country;
             var hr = rsp[i].datetime.substr(11, 2);
             var convhr;
+            var pm = false;
             var min = rsp[i].datetime.substr(14, 2)
             var timeConverter = function(hour){
                 if (hour > 12)
                 convhr = hour - 12
+                pm = true;
             }
             var timeStr = convhr + ':' + min;
             var year = rsp[i].datetime.substr(0, 4);
@@ -30,13 +32,18 @@ var BITFxn = function(){
             timeConverter(hr);
             console.log('Venue Name: ' + rsp[i].venue.name);
             console.log('Venue Location: ' + city + ', ' + region + ', ' + country);
-            console.log('Date: ' + timeStr + ' o\'clock on ' + month + '-' + day + '-' + year);
-        }
+            if (pm){
+                console.log('Date: ' + timeStr + ' PM on ' + month + '-' + day + '-' + year);}
+            else if (!pm){
+                console.log('Date: ' + timeStr + ' AM on ' + month + '-' + day + '-' + year);
+            }
+        };
     }).catch(function(error){
         console.log(error);
         console.log(error.response.data)
     })
 }
+//Spotify Function
 var spotifyFxn = function(){
     var clientId = process.env.SPOTIFY_ID;
     var clientSecret = process.env.SPOTIFY_SECRET;
@@ -77,6 +84,7 @@ var spotifyFxn = function(){
         }
     });
 };
+//OMDB Function
 var OMDBFxn = function(){
     if (!input2){
         input2 = 'Mr.Nobody'
@@ -88,9 +96,9 @@ var OMDBFxn = function(){
         console.log('');
         console.log('Title: '+ rsp.Title);
         console.log('Release Date: ' + rsp.Released);
-        // console.log(rsp.Ratings['0'].Source + ' Rating: ' + Ratings['0'].Value);
+        // console.log(rsp.Ratings[0].Source, 'rating: ', rsp.Ratings[0].Value);
         for(var i = 0; i < rsp.Ratings.length; i++){
-            console.log(rsp.Ratings[i])
+            console.log(rsp.Ratings[i].Source, 'rating: ', rsp.Ratings[i].Value)
         };
         console.log('Made in: ' + rsp.Country );
         console.log('Language: ' + rsp.Language);
@@ -101,6 +109,18 @@ var OMDBFxn = function(){
         console.log(error.rsp);
     })
 };
+var wildCard = function(){
+    fs.readFile('random.txt', 'utf8', function(error, data){
+        if(error){
+        return console.log(error); 
+        }
+        var dataArr = data.split(',');
+        input = dataArr[0];
+        input2 = dataArr[1];
+        decider();
+    });
+}
+//Interpret Inputs
 var decider = function(){
     //BandsInTown
     if(input == 'concert-this'){
@@ -116,16 +136,36 @@ var decider = function(){
     }
     //Wildcard fxn
     else if (input == 'do-what-it-says'){
-        fs.readFile('random.txt', 'utf8', function(error, data){
-            if(error){
-            return console.log(error); 
+        wildCard();
+    }
+    else if(!input2 && !input){
+        var inst = [
+            {
+                resource: '\'Band is in Town\'',
+                key: 'concert-this',
+                noun: 'shows',
+            },{
+                resource: '\'Spotify\'',
+                key: 'spotify-this-song',
+                noun: 'songs'
+            },{
+                resource: '\'OMDB\'',
+                key: 'movie-this',
+                noun: 'movie'
             }
-            var dataArr = data.split(',');
-            input = dataArr[0];
-            input2 = dataArr[1];
-            decider();
-        });
+        ];
+        console.log(' ')
+        console.log('What would you like to do?');
+        console.log('-------------------');
+        for ( var i = 0; i < inst.length; i++){
+            console.log(' ')
+            console.log(inst[i].key + ' will search ' + inst[i].resource + ' for information on the' + inst[i].noun + ' matching your query');
+        }
+        console.log(' ');
+        console.log('Just typing \'do-what-it-says\' will use pre-set search keywords');
+        console.log(' ');
+        console.log('example: \nnode liri.js \'spotify-this-song\' \'I want it that way\'');
     }
 };
-
+//Start the process
 decider();
