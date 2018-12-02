@@ -9,6 +9,7 @@ var input2 = process.argv[3];
 //Band is in Town function
 var BITFxn = function(){
     var BIT = 'https://rest.bandsintown.com/artists/' + input2 + '/events?app_id=codingbootcamp';
+    console.log('\nUpcoming shows for ' + input2 + ':\n')
     axios.get(BIT).then(function(response){
         var rsp = response.data;
         for( var i = 0; i < 5; i++){
@@ -51,9 +52,7 @@ var spotifyFxn = function(){
         id: clientId,
         secret: clientSecret,
     });
-    if (!input2){
-        input2 = 'The Sign Ace of Base'
-        }   
+      
     spotify.search({
         type: 'track',
         query: input2,
@@ -86,9 +85,6 @@ var spotifyFxn = function(){
 };
 //OMDB Function
 var OMDBFxn = function(){
-    if (!input2){
-        input2 = 'Mr.Nobody'
-    }   
     var omdb = 'http://www.omdbapi.com/?apikey=trilogy&t=' + input2;
 
     axios.get(omdb).then(function(response){
@@ -124,14 +120,23 @@ var wildCard = function(){
 var decider = function(){
     //BandsInTown
     if(input == 'concert-this'){
+        if(!input2){
+            input2 = 'Brother Ali';
+        }
         BITFxn();
     }
     //Spotify
     else if(input == 'spotify-this-song'){
+        if (!input2){
+            input2 = 'The Sign Ace of Base'
+        } 
         spotifyFxn();
     }
     //OMDB
     else if (input == 'movie-this'){
+        if (!input2){
+            input2 = 'Mr.Nobody'
+        }   
         OMDBFxn();
     }
     //Wildcard fxn
@@ -141,28 +146,29 @@ var decider = function(){
     else if(!input2 && !input){
         var inst = [
             {
-                resource: '\'Band is in Town\'',
-                key: 'concert-this',
+                resource: 'Band is in Town',
+                key: '\'concert-this\'',
                 noun: 'shows',
             },{
-                resource: '\'Spotify\'',
-                key: 'spotify-this-song',
+                resource: 'Spotify',
+                key: '\'spotify-this-song\'',
                 noun: 'songs'
             },{
-                resource: '\'OMDB\'',
-                key: 'movie-this',
+                resource: 'OMDB',
+                key: '\'movie-this\'',
                 noun: 'movie'
             }
         ];
         console.log(' ')
         console.log('What would you like to do?');
+        console.log('Combine a command and a search keyword for more information on a song, band, or movie!')
         console.log('-------------------');
         for ( var i = 0; i < inst.length; i++){
             console.log(' ')
-            console.log(inst[i].key + ' will search ' + inst[i].resource + ' for information on the' + inst[i].noun + ' matching your query');
+            console.log(inst[i].key + ' will search ' + inst[i].resource + ' for information on the' + inst[i].noun + ' matching your query.');
         }
         console.log(' ');
-        console.log('Just typing \'do-what-it-says\' will use pre-set search keywords');
+        console.log('Just typing \'do-what-it-says\' will use pre-set search keywords.');
         console.log(' ');
         console.log('example: \nnode liri.js \'spotify-this-song\' \'I want it that way\'');
     }
